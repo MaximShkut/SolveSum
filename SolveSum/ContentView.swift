@@ -1,8 +1,8 @@
 //
 //  ContentView.swift
-//  SolveSum
+//  SolveSumFromV
 //
-//  Created by user236450 on 6/4/23.
+//  Created by user236450 on 6/13/23.
 //
 
 import SwiftUI
@@ -32,26 +32,21 @@ struct ContentView: View {
     }
 }
 
+struct CellItem: Identifiable, Hashable {
+    let id = UUID()
+    let value: Int
+    let row: Int
+    let column: Int
+    var isSelected: Bool = false
+    var isDeleted: Bool = false
+}
+
 struct StartGame: View {
     
-    @State private var selectedButtons: [(row: Int, column: Int)] = []
-    @State private var selectedButtonsAndEqualTarget: [(row: Int, column: Int)] = []
-    @State private var arrayAllNumber: [Int] = []
-    @State private var allSelectedButtons: [Int] = []
-    @State private var targetNumber = Int.random(in: 20...40)
-    //@State private var numberButtons: [[Int]] = [[]]
-    
-    private var numberButtons: [[Int]] = {
-        var buttons: [[Int]] = []
-        for _ in 0..<5 {
-            var row: [Int] = []
-            for _ in 0..<5 {
-                row.append(Int.random(in: 1...15))
-            }
-            buttons.append(row)
-        }
-        return buttons
-    }()
+    private let cellSize: CGFloat = 25
+    private let config = GameConfiguration()
+    @State private var targetNumber = 0
+    @State private var cells: [[CellItem]] = [[]]
     
     var body: some View{
         ZStack {
@@ -62,46 +57,26 @@ struct StartGame: View {
                     .font(.largeTitle)
                     .fontWeight(.bold)
                     .padding()
-                ForEach(0..<5) { row in
+                ForEach(cells, id: \.self) { row in
                     HStack {
-                        ForEach(0..<5) { column in
-                            let numberButton = numberButtons[row][column]
-                            
+                        ForEach(row) { cell in
                             Button(action: {
-                                if !isButtonSelected(row: row, column: column) {
-                                    selectedButtons.append((row, column))
-                                    allSelectedButtons.append(numberButtons[row][column])
-                                    
-                                    if sumSelectedNumber(allSelectedButtons) == targetNumber {
-                                        selectedButtonsAndEqualTarget += selectedButtons
-                                        selectedButtons.removeAll()
-                                        arrayAllNumber = arrayAllNumber.filter { !allSelectedButtons.contains($0) }
-                                        allSelectedButtons.removeAll()
-                                    }
-                                    else if sumSelectedNumber(allSelectedButtons) > targetNumber{
-                                        selectedButtons.removeAll()
-                                        allSelectedButtons.removeAll()
-                                    }
-                                }
-                                if isContainsTuple(selectedButtonsAndEqualTarget, (row, column)){
-                                    targetNumber = updateTargetNumber(arr: arrayAllNumber)
-                                }
+                                cells[cell.row][cell.column].isSelected = !cells[cell.row][cell.column].isSelected
+                                checkProgress()
                             }) {
-                                Text("\(numberButton)")
-                                    .frame(width: 30, height: 30)
+                                Text("\(cell.value)")
+                                    .frame(width: cellSize, height: cellSize)
                                     .padding()
                                     .background(Group{
-                                        if isButtonSelected(row: row, column: column) {
+                                        if cell.isSelected {
                                             Color.green
-                                        }
-                                        else if isContainsTuple(selectedButtonsAndEqualTarget, (row, column)){
-                                            Color.white
                                         }
                                         else {
                                             Color.blue
-                                        }})
-                                    .opacity(!isContainsTuple(selectedButtonsAndEqualTarget, (row, column)) ? 1 : 0)
-                                    .animation(.easeInOut(duration: isButtonSelected(row: row, column: column) ? 0.3 : 3.0 ))
+                                        }
+                                    })
+                                    .opacity(cell.isDeleted ? 0 : 1)
+                                    .animation(.easeInOut(duration: cell.isSelected ? 0.2 : 0.2 ))
                                     .foregroundColor(.white)
                                     .font(.headline)
                                     .cornerRadius(10)
@@ -112,7 +87,7 @@ struct StartGame: View {
                 //Text("\(sumSelectedNumber(allSelectedButtons))")
                 
                 Button(action: {
-                    resetGame()
+                    startGame()
                 }) {
                     Text("Reset")
                         .font(.headline)
@@ -123,78 +98,57 @@ struct StartGame: View {
                 }
             }
             .onAppear{
-                resetGame()
+                startGame()
             }
         }
         .ignoresSafeArea()
     }
-    private func isButtonSelected(row: Int, column: Int) -> Bool {
-        return selectedButtons.contains { $0.row == row && $0.column == column }
+    
+    func checkProgress() {
+        let selectedSum = sumSelectedNumber()
+        if selectedSum == self.targetNumber {
+            let allCells = cells.flatMap { $0 }.filter { $0.isSelected && !$0.isDeleted }
+            for cell in allCells {
+                cells[cell.row][cell.column].isDeleted = true
+            }
+            updateTargetNumber()
+        }
     }
     
-    func sumSelectedNumber (_ array: [Int]) -> Int{
+    func sumSelectedNumber () -> Int {
+        cells.flatMap {$0 }.filter { $0.isSelected && !$0.isDeleted  }.reduce(0) { $0 + $1.value }
+    }
+    
+    func updateTargetNumber() {
+        var arr = cells.flatMap { $0 }
         var sum = 0
-        for i in array {
-            sum += i
+        var cellsCount = 0
+        
+        // тут лучше выше среднего чтобы сумма была, а то одни 10 будут
+        while sum < config.maxCellValue && cellsCount < config.maxCellsToSelect {
+            arr = arr.shuffled()
+            sum += arr.popLast()!.value
+            cellsCount += 1
         }
-        return sum
+        
+        self.targetNumber = sum
     }
     
-    func isContainsTuple<T: Equatable>(_ array: [(T, T)], _ tuple: (T, T)) -> Bool {
-        return array.contains(where: { $0 == tuple })
+    func generateCells() {
+        self.cells = []
+        for row in 0..<config.boardSize {
+            cells.append([])
+            for col in 0..<config.boardSize {
+                let value = Int.random(in: 1...config.maxCellValue)
+                let cell = CellItem(value: value, row: row, column: col)
+                cells[row].append(cell)
+            }
+        }
     }
     
-    func twoDArrayToOneDArray (arr: [[Int]]) -> [Int] {
-        
-        var oneDimensionArray:[Int] = []
-        
-        for row in arr {
-            for element in row {
-                oneDimensionArray.append(element)
-            }
-        }
-        
-        return oneDimensionArray
-    }
-    
-    func updateTargetNumber(arr: [Int]) -> Int{
-        var sum = 0
-        
-        if arr.count > 20 {
-            for _ in 1...4 {
-                sum += arr.randomElement() ?? 0
-            }
-        }
-        else if arr.count > 5{
-            for _ in 1...3{
-                sum += arr.randomElement() ?? 0
-            }
-        }
-        else {
-            sum = (arr.randomElement() ?? 0) + (arr.randomElement() ?? 0)
-        }
-        
-        return sum
-    }
-//
-//    func generateNumberButtons() {
-//        var buttons: [[Int]] = []
-//        for _ in 0..<5 {
-//            var row: [Int] = []
-//            for _ in 0..<5 {
-//                row.append(Int.random(in: 1...15))
-//            }
-//            buttons.append(row)
-//        }
-//        numberButtons = buttons
-//    }
-//
-    func resetGame() {
-        selectedButtons.removeAll()
-        selectedButtonsAndEqualTarget.removeAll()
-        allSelectedButtons.removeAll()
-        arrayAllNumber = twoDArrayToOneDArray(arr: numberButtons)
-        targetNumber = Int.random(in: 20...40)
+    func startGame() {
+        generateCells()
+        updateTargetNumber()
     }
     
 }

@@ -11,6 +11,7 @@
 		5AD968B22A2C994100268AE7 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AD968B12A2C994100268AE7 /* ContentView.swift */; };
 		5AD968B42A2C994200268AE7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5AD968B32A2C994200268AE7 /* Assets.xcassets */; };
 		5AD968B72A2C994200268AE7 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5AD968B62A2C994200268AE7 /* Preview Assets.xcassets */; };
+		5AEB38002A3A1B9C00BE51BC /* GameConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AEB37FF2A3A1B9C00BE51BC /* GameConfiguration.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -19,6 +20,7 @@
 		5AD968B12A2C994100268AE7 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		5AD968B32A2C994200268AE7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5AD968B62A2C994200268AE7 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		5AEB37FF2A3A1B9C00BE51BC /* GameConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameConfiguration.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,6 +55,7 @@
 			children = (
 				5AD968AF2A2C994100268AE7 /* SolveSumApp.swift */,
 				5AD968B12A2C994100268AE7 /* ContentView.swift */,
+				5AEB37FF2A3A1B9C00BE51BC /* GameConfiguration.swift */,
 				5AD968B32A2C994200268AE7 /* Assets.xcassets */,
 				5AD968B52A2C994200268AE7 /* Preview Content */,
 			);
@@ -137,6 +140,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5AEB38002A3A1B9C00BE51BC /* GameConfiguration.swift in Sources */,
 				5AD968B22A2C994100268AE7 /* ContentView.swift in Sources */,
 				5AD968B02A2C994100268AE7 /* SolveSumApp.swift in Sources */,
 			);
