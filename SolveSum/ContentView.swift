@@ -34,7 +34,7 @@ struct ContentView: View {
 
 struct CellItem: Identifiable, Hashable {
     let id = UUID()
-    let value: Int
+    var value: Int?
     let row: Int
     let column: Int
     var isSelected: Bool = false
@@ -64,27 +64,28 @@ struct StartGame: View {
                                 cells[cell.row][cell.column].isSelected = !cells[cell.row][cell.column].isSelected
                                 checkProgress()
                             }) {
-                                Text("\(cell.value)")
-                                    .frame(width: cellSize, height: cellSize)
-                                    .padding()
-                                    .background(Group{
-                                        if cell.isSelected {
-                                            Color.green
-                                        }
-                                        else {
-                                            Color.blue
-                                        }
-                                    })
-                                    .opacity(cell.isDeleted ? 0 : 1)
-                                    .animation(.easeInOut(duration: cell.isSelected ? 0.2 : 0.2 ))
-                                    .foregroundColor(.white)
-                                    .font(.headline)
-                                    .cornerRadius(10)
+                                if let value = cell.value{
+                                    Text("\(value)")
+                                        .frame(width: cellSize, height: cellSize)
+                                        .padding()
+                                        .background(cell.isSelected ? .green : .blue)
+                                        .animation(.easeInOut(duration: cell.isSelected ? 0.2 : 0.2 ))
+                                        .foregroundColor(.white)
+                                        .font(.headline)
+                                        .cornerRadius(10)
+                                }
+                                else{
+                                    Rectangle()
+                                        .frame(width: cellSize, height: cellSize)
+                                        .padding()
+                                        .background(Color.clear)
+                                        .opacity(0)
+                                        .cornerRadius(10)
+                                }
                             }
                         }
                     }
                 }
-                //Text("\(sumSelectedNumber(allSelectedButtons))")
                 
                 Button(action: {
                     startGame()
@@ -104,22 +105,35 @@ struct StartGame: View {
         .ignoresSafeArea()
     }
     
-    func checkProgress() {
+    private func removeDeletedCells() {
+        cells = cells.map { row in
+            row.map { cell in
+                if cell.isDeleted {
+                    return CellItem(value: nil, row: cell.row, column: cell.column, isSelected: false, isDeleted: false)
+                } else {
+                    return cell
+                }
+            }
+        }
+    }
+    
+    private func checkProgress() {
         let selectedSum = sumSelectedNumber()
         if selectedSum == self.targetNumber {
             let allCells = cells.flatMap { $0 }.filter { $0.isSelected && !$0.isDeleted }
             for cell in allCells {
                 cells[cell.row][cell.column].isDeleted = true
             }
+            removeDeletedCells()
             updateTargetNumber()
         }
     }
     
-    func sumSelectedNumber () -> Int {
-        cells.flatMap {$0 }.filter { $0.isSelected && !$0.isDeleted  }.reduce(0) { $0 + $1.value }
+    private func sumSelectedNumber () -> Int {
+        cells.flatMap {$0 }.filter { $0.isSelected && !$0.isDeleted  }.reduce(0) { $0 + ($1.value ?? 0) }
     }
     
-    func updateTargetNumber() {
+    private func updateTargetNumber() {
         var arr = cells.flatMap { $0 }
         var sum = 0
         var cellsCount = 0
@@ -127,14 +141,14 @@ struct StartGame: View {
         // тут лучше выше среднего чтобы сумма была, а то одни 10 будут
         while sum < config.maxCellValue && cellsCount < config.maxCellsToSelect {
             arr = arr.shuffled()
-            sum += arr.popLast()!.value
+            sum += arr.popLast()!.value ?? 0
             cellsCount += 1
         }
         
         self.targetNumber = sum
     }
     
-    func generateCells() {
+    private func generateCells() {
         self.cells = []
         for row in 0..<config.boardSize {
             cells.append([])
@@ -144,9 +158,10 @@ struct StartGame: View {
                 cells[row].append(cell)
             }
         }
+        removeDeletedCells()
     }
     
-    func startGame() {
+    private func startGame() {
         generateCells()
         updateTargetNumber()
     }
