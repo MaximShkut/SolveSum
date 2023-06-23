@@ -97,12 +97,36 @@ struct StartGame: View {
                         .background(Color.red)
                         .cornerRadius(10)
                 }
+                Button(action: addButtonTapped) {
+                    Text("Add")
+                        .font(.headline)
+                        .padding()
+                        .foregroundColor(.white)
+                        .background(Color.green)
+                        .cornerRadius(10)
+                }
             }
             .onAppear{
                 startGame()
             }
         }
         .ignoresSafeArea()
+    }
+    
+    func addButtonTapped() {
+                
+        var emptyCells: [(row: Int, column: Int)] = []
+        for row in 0..<config.boardSize {
+            for column in 0..<config.boardSize {
+                if cells[row][column].value == nil {
+                    emptyCells.append((row, column))
+                }
+            }
+        }
+        
+        if let randomEmptyCell = emptyCells.randomElement() {
+            cells[randomEmptyCell.row][randomEmptyCell.column].value = Int.random(in: 1...config.maxCellValue)
+        }
     }
     
     private func removeDeletedCells() {
