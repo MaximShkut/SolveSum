@@ -34,9 +34,9 @@ struct ContentView: View {
 
 struct CellItem: Identifiable, Hashable {
     let id = UUID()
-    var value: Int?
-    let row: Int
-    let column: Int
+    var value: Int
+    var row: Int
+    var column: Int
     var isSelected: Bool = false
     var isDeleted: Bool = false
 }
@@ -46,7 +46,7 @@ struct StartGame: View {
     private let cellSize: CGFloat = 25
     private let config = GameConfiguration()
     @State private var targetNumber = 0
-    @State private var cells: [[CellItem]] = [[]]
+    @State private var cells: [CellItem] = []
     
     var body: some View{
         ZStack {
@@ -57,30 +57,33 @@ struct StartGame: View {
                     .font(.largeTitle)
                     .fontWeight(.bold)
                     .padding()
-                ForEach(cells, id: \.self) { row in
+                ForEach(0..<config.boardSize, id: \.self) { row in
                     HStack {
-                        ForEach(row) { cell in
-                            Button(action: {
-                                cells[cell.row][cell.column].isSelected = !cells[cell.row][cell.column].isSelected
-                                checkProgress()
-                            }) {
-                                if let value = cell.value{
-                                    Text("\(value)")
-                                        .frame(width: cellSize, height: cellSize)
-                                        .padding()
-                                        .background(cell.isSelected ? .green : .blue)
-                                        .animation(.easeInOut(duration: cell.isSelected ? 0.2 : 0.2 ))
-                                        .foregroundColor(.white)
-                                        .font(.headline)
-                                        .cornerRadius(10)
-                                }
+                        ForEach(0..<config.boardSize, id: \.self) { column in
+                            if let cell = getCell(row: row, column: column){
+                                if !cell.isDeleted{
+                                    Button(action: {
+                                        if let index = cells.firstIndex(of: cell){
+                                            cells[index].isSelected.toggle()
+                                            checkProgress()
+                                        }
+                                    }){
+                                        Text("\(cell.value)")
+                                            .frame(width: cellSize, height: cellSize)
+                                            .padding()
+                                            .background(cell.isSelected ? .green : .blue)
+                                            .foregroundColor(.white)
+                                            .font(.headline)
+                                            .cornerRadius(10)
+                                    }}
                                 else{
                                     Rectangle()
                                         .frame(width: cellSize, height: cellSize)
+                                        .background(Color.red)
                                         .padding()
-                                        .background(Color.clear)
                                         .opacity(0)
                                         .cornerRadius(10)
+                                        .zIndex(100)
                                 }
                             }
                         }
@@ -113,29 +116,37 @@ struct StartGame: View {
         .ignoresSafeArea()
     }
     
-    func addButtonTapped() {
-                
-        var emptyCells: [(row: Int, column: Int)] = []
-        for row in 0..<config.boardSize {
-            for column in 0..<config.boardSize {
-                if cells[row][column].value == nil {
-                    emptyCells.append((row, column))
+    private func getCellInColumn(column: Int) -> [CellItem] {
+        return cells.filter({$0.column == column}).sorted{ $0.row > $1.row}
+    }
+    
+    private func movingCells() {
+        for column in 0..<config.boardSize{
+            var value = 0
+            for  cell in getCellInColumn(column: column){
+                if let index = cells.firstIndex(of: cell){
+                    if cell.isDeleted{
+                        let moveIndex = cells.filter{$0.column == column}.filter{$0.row < cell.row && !$0.isDeleted}.count
+                        cells[index].row -= moveIndex
+                        value += 1
+                    }
+                    else{
+                        withAnimation{
+                            cells[index].row += value
+                        }
+                    }
                 }
             }
         }
-        
-        if let randomEmptyCell = emptyCells.randomElement() {
-            cells[randomEmptyCell.row][randomEmptyCell.column].value = Int.random(in: 1...config.maxCellValue)
-        }
     }
     
-    private func removeDeletedCells() {
-        cells = cells.map { row in
-            row.map { cell in
-                if cell.isDeleted {
-                    return CellItem(value: nil, row: cell.row, column: cell.column, isSelected: false, isDeleted: false)
-                } else {
-                    return cell
+    private func addButtonTapped() {
+        let allCells = cells.compactMap { $0 }.filter { $0.isDeleted }
+        for cell in allCells {
+            if let index = cells.firstIndex(of: cell){
+                withAnimation{
+                    cells[index].value = Int.random(in: 1...config.maxCellValue)
+                    cells[index].isDeleted = false
                 }
             }
         }
@@ -144,28 +155,33 @@ struct StartGame: View {
     private func checkProgress() {
         let selectedSum = sumSelectedNumber()
         if selectedSum == self.targetNumber {
-            let allCells = cells.flatMap { $0 }.filter { $0.isSelected && !$0.isDeleted }
+            let allCells = cells.compactMap { $0 }.filter { $0.isSelected }
             for cell in allCells {
-                cells[cell.row][cell.column].isDeleted = true
+                if let index = cells.firstIndex(of: cell){
+                    withAnimation{
+                        cells[index].isDeleted = true
+                        cells[index].isSelected = false
+                    }
+                }
             }
-            removeDeletedCells()
+            movingCells()
             updateTargetNumber()
         }
     }
     
     private func sumSelectedNumber () -> Int {
-        cells.flatMap {$0 }.filter { $0.isSelected && !$0.isDeleted  }.reduce(0) { $0 + ($1.value ?? 0) }
+        cells.compactMap {$0 }.filter { $0.isSelected && !$0.isDeleted  }.reduce(0) { $0 + ($1.value ) }
     }
     
     private func updateTargetNumber() {
-        var arr = cells.flatMap { $0 }
+        var arr = cells.compactMap { $0 }
         var sum = 0
         var cellsCount = 0
         
         // тут лучше выше среднего чтобы сумма была, а то одни 10 будут
         while sum < config.maxCellValue && cellsCount < config.maxCellsToSelect {
             arr = arr.shuffled()
-            sum += arr.popLast()!.value ?? 0
+            sum += arr.popLast()!.value
             cellsCount += 1
         }
         
@@ -175,14 +191,12 @@ struct StartGame: View {
     private func generateCells() {
         self.cells = []
         for row in 0..<config.boardSize {
-            cells.append([])
             for col in 0..<config.boardSize {
                 let value = Int.random(in: 1...config.maxCellValue)
                 let cell = CellItem(value: value, row: row, column: col)
-                cells[row].append(cell)
+                cells.append(cell)
             }
         }
-        removeDeletedCells()
     }
     
     private func startGame() {
@@ -190,7 +204,12 @@ struct StartGame: View {
         updateTargetNumber()
     }
     
+    private func getCell(row: Int, column: Int) -> CellItem? {
+        return cells.first(where: { $0.row == row && $0.column == column })
+    }
 }
+
+
 
 struct StyleForButtonInPreviewScreen: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
