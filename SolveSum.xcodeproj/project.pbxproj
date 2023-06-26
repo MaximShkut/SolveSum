@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5AB059182A49FCD500682F95 /* UIScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AB059172A49FCD500682F95 /* UIScreen.swift */; };
 		5AD968B02A2C994100268AE7 /* SolveSumApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AD968AF2A2C994100268AE7 /* SolveSumApp.swift */; };
 		5AD968B22A2C994100268AE7 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AD968B12A2C994100268AE7 /* ContentView.swift */; };
 		5AD968B42A2C994200268AE7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5AD968B32A2C994200268AE7 /* Assets.xcassets */; };
@@ -15,6 +16,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5AB059172A49FCD500682F95 /* UIScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIScreen.swift; sourceTree = "<group>"; };
 		5AD968AC2A2C994100268AE7 /* SolveSum.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SolveSum.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5AD968AF2A2C994100268AE7 /* SolveSumApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolveSumApp.swift; sourceTree = "<group>"; };
 		5AD968B12A2C994100268AE7 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -56,6 +58,7 @@
 				5AD968AF2A2C994100268AE7 /* SolveSumApp.swift */,
 				5AD968B12A2C994100268AE7 /* ContentView.swift */,
 				5AEB37FF2A3A1B9C00BE51BC /* GameConfiguration.swift */,
+				5AB059172A49FCD500682F95 /* UIScreen.swift */,
 				5AD968B32A2C994200268AE7 /* Assets.xcassets */,
 				5AD968B52A2C994200268AE7 /* Preview Content */,
 			);
@@ -143,6 +146,7 @@
 				5AEB38002A3A1B9C00BE51BC /* GameConfiguration.swift in Sources */,
 				5AD968B22A2C994100268AE7 /* ContentView.swift in Sources */,
 				5AD968B02A2C994100268AE7 /* SolveSumApp.swift in Sources */,
+				5AB059182A49FCD500682F95 /* UIScreen.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

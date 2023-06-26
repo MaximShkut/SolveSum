@@ -39,16 +39,21 @@ struct CellItem: Identifiable, Hashable {
     var column: Int
     var isSelected: Bool = false
     var isDeleted: Bool = false
+    var offset: CGSize = .zero
+    
+    func hash(into hasher: inout Hasher) {
+            hasher.combine(id)
+        }
 }
 
 struct StartGame: View {
-    
-    private let cellSize: CGFloat = 25
     private let config = GameConfiguration()
+    private let cellSize: CGFloat = 25
     @State private var targetNumber = 0
     @State private var cells: [CellItem] = []
     
     var body: some View{
+        
         ZStack {
             LinearGradient(gradient: Gradient(colors: [Color.purple, Color.blue]), startPoint: .top, endPoint: .bottom)
             
@@ -75,15 +80,17 @@ struct StartGame: View {
                                             .foregroundColor(.white)
                                             .font(.headline)
                                             .cornerRadius(10)
+                                            .offset()
+                                            //.transition(.move(edge: .top))
+                                            //.animation(.linear(duration: 0.5))
                                     }}
                                 else{
                                     Rectangle()
                                         .frame(width: cellSize, height: cellSize)
-                                        .background(Color.red)
                                         .padding()
                                         .opacity(0)
-                                        .cornerRadius(10)
-                                        .zIndex(100)
+                                        //.transition(.move(edge: .bottom))
+                                        //.animation(.linear(duration: 0.5))
                                 }
                             }
                         }
@@ -131,9 +138,11 @@ struct StartGame: View {
                         value += 1
                     }
                     else{
-                        withAnimation{
-                            cells[index].row += value
-                        }
+                        cells[index].row += value
+                    }
+                    withAnimation(.linear(duration: 0.3)) {
+                        let offsetY = CGFloat(cells[index].row - cell.row) * cellSize
+                        cells[index].offset = CGSize(width: 0, height: offsetY)
                     }
                 }
             }
@@ -141,13 +150,12 @@ struct StartGame: View {
     }
     
     private func addButtonTapped() {
-        let allCells = cells.compactMap { $0 }.filter { $0.isDeleted }
-        for cell in allCells {
-            if let index = cells.firstIndex(of: cell){
-                withAnimation{
-                    cells[index].value = Int.random(in: 1...config.maxCellValue)
-                    cells[index].isDeleted = false
-                }
+        let allCells = cells.filter { $0.isDeleted }.sorted{ $0.row < $1.row }.reversed()
+        if let index = cells.firstIndex(of:  allCells.first!){
+            withAnimation(Animation.linear(duration: 0.3).delay(0.1)){
+                cells[index].value = Int.random(in: 1...config.maxCellValue)
+                cells[index].isDeleted = false
+                cells[index].isSelected = false
             }
         }
     }
@@ -158,13 +166,15 @@ struct StartGame: View {
             let allCells = cells.compactMap { $0 }.filter { $0.isSelected }
             for cell in allCells {
                 if let index = cells.firstIndex(of: cell){
-                    withAnimation{
-                        cells[index].isDeleted = true
-                        cells[index].isSelected = false
-                    }
+                    cells[index].isDeleted = true
+                    cells[index].isSelected = false
                 }
             }
-            movingCells()
+            //withAnimation(Animation.easeInOut(duration: 5)){
+                movingCells()
+            //}
+            
+            
             updateTargetNumber()
         }
     }
