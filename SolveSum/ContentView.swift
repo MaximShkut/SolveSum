@@ -39,16 +39,12 @@ struct CellItem: Identifiable, Hashable {
     var column: Int
     var isSelected: Bool = false
     var isDeleted: Bool = false
-    var offset: CGSize = .zero
-    
-    func hash(into hasher: inout Hasher) {
-            hasher.combine(id)
-        }
+    var offset: CGFloat = 0
 }
 
 struct StartGame: View {
     private let config = GameConfiguration()
-    private let cellSize: CGFloat = 25
+    @State private var cellSize: CGFloat = 0
     @State private var targetNumber = 0
     @State private var cells: [CellItem] = []
     
@@ -57,13 +53,13 @@ struct StartGame: View {
         ZStack {
             LinearGradient(gradient: Gradient(colors: [Color.purple, Color.blue]), startPoint: .top, endPoint: .bottom)
             
-            VStack {
+            VStack(spacing: 10) {
                 Text("\(targetNumber)")
                     .font(.largeTitle)
                     .fontWeight(.bold)
                     .padding()
                 ForEach(0..<config.boardSize, id: \.self) { row in
-                    HStack {
+                    HStack(spacing: 10) {
                         ForEach(0..<config.boardSize, id: \.self) { column in
                             if let cell = getCell(row: row, column: column){
                                 if !cell.isDeleted{
@@ -72,48 +68,48 @@ struct StartGame: View {
                                             cells[index].isSelected.toggle()
                                             checkProgress()
                                         }
-                                    }){
+                                    }, label: {
                                         Text("\(cell.value)")
-                                            .frame(width: cellSize, height: cellSize)
-                                            .padding()
-                                            .background(cell.isSelected ? .green : .blue)
-                                            .foregroundColor(.white)
-                                            .font(.headline)
-                                            .cornerRadius(10)
-                                            .offset()
-                                            //.transition(.move(edge: .top))
-                                            //.animation(.linear(duration: 0.5))
-                                    }}
+                                    })
+                                    .frame(width: cellSize, height: cellSize)
+                                    .background(cell.isSelected ? .green : .blue)
+                                    .foregroundColor(.white)
+                                    .font(.headline)
+                                    .cornerRadius(10)
+                                    .offset(y: cell.offset)
+                                }
                                 else{
                                     Rectangle()
                                         .frame(width: cellSize, height: cellSize)
-                                        .padding()
                                         .opacity(0)
-                                        //.transition(.move(edge: .bottom))
-                                        //.animation(.linear(duration: 0.5))
+                                    //.transition(.move(edge: .bottom))
+                                    //.animation(.linear(duration: 0.5))
                                 }
                             }
                         }
                     }
                 }
-                
-                Button(action: {
-                    startGame()
-                }) {
-                    Text("Reset")
-                        .font(.headline)
-                        .padding()
-                        .foregroundColor(.white)
-                        .background(Color.red)
-                        .cornerRadius(10)
-                }
-                Button(action: addButtonTapped) {
-                    Text("Add")
-                        .font(.headline)
-                        .padding()
-                        .foregroundColor(.white)
-                        .background(Color.green)
-                        .cornerRadius(10)
+                HStack{
+                    Button(action: {
+                        startGame()
+                    }) {
+                        Text("Reset")
+                            .font(.headline)
+                            .padding()
+                            .foregroundColor(.white)
+                            .background(Color.red)
+                            .cornerRadius(10)
+                    }
+                    Button(action: {
+                        addButtonTapped()
+                    }, label: {
+                        Text("Add Button")
+                    })
+                    .font(.headline)
+                    .padding()
+                    .foregroundColor(.white)
+                    .background(Color.green)
+                    .cornerRadius(10)
                 }
             }
             .onAppear{
@@ -129,9 +125,27 @@ struct StartGame: View {
     
     private func movingCells() {
         for column in 0..<config.boardSize{
-            var value = 0
+            var value: Int = 0
             for  cell in getCellInColumn(column: column){
-                if let index = cells.firstIndex(of: cell){
+                if let index = cells.firstIndex(where: {$0.id == cell.id}){
+                    if cell.isDeleted{
+                        value += 1
+                    }
+                    else{
+                        withAnimation(.easeOut(duration: 0.5)) {
+                            cells[index].offset = CGFloat(value) * (self.cellSize + 10)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    private func rewriteField(){
+        for column in 0..<config.boardSize{
+            var value: Int = 0
+            for  cell in getCellInColumn(column: column){
+                if let index = cells.firstIndex(where: {$0.id == cell.id}){
                     if cell.isDeleted{
                         let moveIndex = cells.filter{$0.column == column}.filter{$0.row < cell.row && !$0.isDeleted}.count
                         cells[index].row -= moveIndex
@@ -139,10 +153,7 @@ struct StartGame: View {
                     }
                     else{
                         cells[index].row += value
-                    }
-                    withAnimation(.linear(duration: 0.3)) {
-                        let offsetY = CGFloat(cells[index].row - cell.row) * cellSize
-                        cells[index].offset = CGSize(width: 0, height: offsetY)
+                        cells[index].offset = 0
                     }
                 }
             }
@@ -150,17 +161,18 @@ struct StartGame: View {
     }
     
     private func addButtonTapped() {
-        let allCells = cells.filter { $0.isDeleted }.sorted{ $0.row < $1.row }.reversed()
-        if let index = cells.firstIndex(of:  allCells.first!){
-            withAnimation(Animation.linear(duration: 0.3).delay(0.1)){
-                cells[index].value = Int.random(in: 1...config.maxCellValue)
-                cells[index].isDeleted = false
-                cells[index].isSelected = false
+        if let deletedCells = cells.filter({ $0.isDeleted }).sorted(by: {$0.row > $1.row} ).first{
+            if let index = cells.firstIndex(of:  deletedCells){
+                withAnimation(.easeOut(duration: 0.3)){
+                    cells[index].value = Int.random(in: 1...config.maxCellValue)
+                    cells[index].isDeleted = false
+                }
             }
         }
     }
     
     private func checkProgress() {
+        
         let selectedSum = sumSelectedNumber()
         if selectedSum == self.targetNumber {
             let allCells = cells.compactMap { $0 }.filter { $0.isSelected }
@@ -170,12 +182,11 @@ struct StartGame: View {
                     cells[index].isSelected = false
                 }
             }
-            //withAnimation(Animation.easeInOut(duration: 5)){
-                movingCells()
-            //}
-            
-            
+            movingCells()
             updateTargetNumber()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
+                rewriteField()
+            }
         }
     }
     
@@ -209,13 +220,22 @@ struct StartGame: View {
         }
     }
     
+    private func getCell(row: Int, column: Int) -> CellItem? {
+        return cells.first(where: { $0.row == row && $0.column == column })
+    }
+    
+    private func getCellSize(){
+        let boardSize = config.boardSize
+        var widthScreen = UIScreen.screenWidth
+        widthScreen -= 20 * CGFloat(2)
+        widthScreen -=  CGFloat(10 * (boardSize - 1))
+        self.cellSize = widthScreen / CGFloat(boardSize)
+    }
+    
     private func startGame() {
         generateCells()
         updateTargetNumber()
-    }
-    
-    private func getCell(row: Int, column: Int) -> CellItem? {
-        return cells.first(where: { $0.row == row && $0.column == column })
+        getCellSize()
     }
 }
 
