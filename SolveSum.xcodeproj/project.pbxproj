@@ -7,19 +7,27 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5A13411C2A52C1A7000122B3 /* StartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A13411B2A52C1A7000122B3 /* StartView.swift */; };
+		5A13411E2A52C1E3000122B3 /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A13411D2A52C1E3000122B3 /* GameView.swift */; };
 		5AB059182A49FCD500682F95 /* UIScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AB059172A49FCD500682F95 /* UIScreen.swift */; };
+		5AC3E5402A5181B2003C9CD6 /* GameViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AC3E53F2A5181B2003C9CD6 /* GameViewModel.swift */; };
+		5AC3E5422A518312003C9CD6 /* ButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AC3E5412A518312003C9CD6 /* ButtonStyle.swift */; };
+		5AC3E5442A5183A5003C9CD6 /* CellItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AC3E5432A5183A5003C9CD6 /* CellItem.swift */; };
 		5AD968B02A2C994100268AE7 /* SolveSumApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AD968AF2A2C994100268AE7 /* SolveSumApp.swift */; };
-		5AD968B22A2C994100268AE7 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AD968B12A2C994100268AE7 /* ContentView.swift */; };
 		5AD968B42A2C994200268AE7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5AD968B32A2C994200268AE7 /* Assets.xcassets */; };
 		5AD968B72A2C994200268AE7 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5AD968B62A2C994200268AE7 /* Preview Assets.xcassets */; };
 		5AEB38002A3A1B9C00BE51BC /* GameConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AEB37FF2A3A1B9C00BE51BC /* GameConfiguration.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5A13411B2A52C1A7000122B3 /* StartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartView.swift; sourceTree = "<group>"; };
+		5A13411D2A52C1E3000122B3 /* GameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
 		5AB059172A49FCD500682F95 /* UIScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIScreen.swift; sourceTree = "<group>"; };
+		5AC3E53F2A5181B2003C9CD6 /* GameViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewModel.swift; sourceTree = "<group>"; };
+		5AC3E5412A518312003C9CD6 /* ButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonStyle.swift; sourceTree = "<group>"; };
+		5AC3E5432A5183A5003C9CD6 /* CellItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellItem.swift; sourceTree = "<group>"; };
 		5AD968AC2A2C994100268AE7 /* SolveSum.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SolveSum.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5AD968AF2A2C994100268AE7 /* SolveSumApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolveSumApp.swift; sourceTree = "<group>"; };
-		5AD968B12A2C994100268AE7 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		5AD968B32A2C994200268AE7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5AD968B62A2C994200268AE7 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		5AEB37FF2A3A1B9C00BE51BC /* GameConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameConfiguration.swift; sourceTree = "<group>"; };
@@ -36,6 +44,33 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5AC3E53D2A51817D003C9CD6 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				5AC3E53F2A5181B2003C9CD6 /* GameViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		5AC3E53E2A51818A003C9CD6 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				5A13411B2A52C1A7000122B3 /* StartView.swift */,
+				5A13411D2A52C1E3000122B3 /* GameView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		5AC3E5492A51861C003C9CD6 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				5AC3E5432A5183A5003C9CD6 /* CellItem.swift */,
+				5AC3E5412A518312003C9CD6 /* ButtonStyle.swift */,
+				5AEB37FF2A3A1B9C00BE51BC /* GameConfiguration.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
 		5AD968A32A2C994100268AE7 = {
 			isa = PBXGroup;
 			children = (
@@ -55,10 +90,11 @@
 		5AD968AE2A2C994100268AE7 /* SolveSum */ = {
 			isa = PBXGroup;
 			children = (
-				5AD968AF2A2C994100268AE7 /* SolveSumApp.swift */,
-				5AD968B12A2C994100268AE7 /* ContentView.swift */,
-				5AEB37FF2A3A1B9C00BE51BC /* GameConfiguration.swift */,
+				5AC3E5492A51861C003C9CD6 /* Models */,
+				5AC3E53D2A51817D003C9CD6 /* ViewModels */,
+				5AC3E53E2A51818A003C9CD6 /* Views */,
 				5AB059172A49FCD500682F95 /* UIScreen.swift */,
+				5AD968AF2A2C994100268AE7 /* SolveSumApp.swift */,
 				5AD968B32A2C994200268AE7 /* Assets.xcassets */,
 				5AD968B52A2C994200268AE7 /* Preview Content */,
 			);
@@ -144,9 +180,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				5AEB38002A3A1B9C00BE51BC /* GameConfiguration.swift in Sources */,
-				5AD968B22A2C994100268AE7 /* ContentView.swift in Sources */,
 				5AD968B02A2C994100268AE7 /* SolveSumApp.swift in Sources */,
+				5A13411C2A52C1A7000122B3 /* StartView.swift in Sources */,
+				5A13411E2A52C1E3000122B3 /* GameView.swift in Sources */,
+				5AC3E5422A518312003C9CD6 /* ButtonStyle.swift in Sources */,
+				5AC3E5402A5181B2003C9CD6 /* GameViewModel.swift in Sources */,
 				5AB059182A49FCD500682F95 /* UIScreen.swift in Sources */,
+				5AC3E5442A5183A5003C9CD6 /* CellItem.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
