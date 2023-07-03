@@ -9,7 +9,7 @@ import SwiftUI
 
 struct StartView: View {
     @ObservedObject var viewModel = GameViewModel()
-    @State private var showSettings = false
+    @State private var showConfigurationView = false
     
     var body: some View {
         NavigationView {
@@ -21,36 +21,33 @@ struct StartView: View {
                         Text("Start Game")
                     }
                     .buttonStyle(StyleForButtonInPreviewScreen())
-                    
-                    Button("Exit") {
+                    Button(action: {
                         //exit(0)
-                    }
+                    }, label: {
+                        Text("Exit")
+                    })
                     .buttonStyle(StyleForButtonInPreviewScreen())
                     
-                    Button("Configuration") {
-                        showSettings = true
-                    }
+                    Button(action: {
+                        showConfigurationView.toggle()
+                    }, label: {
+                        Text("Configuration")
+                    })
                     .buttonStyle(StyleForButtonInPreviewScreen())
-                    .actionSheet(isPresented: $showSettings) {
-                        ActionSheet(
-                            title: Text("Game Configuration"),
-                            message: Text("Configure game difficulty and board size"),
-                            buttons: [
-                                .default(Text("Easy")) {
-                                    viewModel.makeEasyConfiguration()
-                                },
-                                .default(Text("Medium")) {
-                                    viewModel.makeEasyConfiguration()
-                                },
-                                .default(Text("Hard")) {
-                                    viewModel.makeEasyConfiguration()
-                                },
-                                .cancel()
-                            ]
-                        )
-                    }
                 }
                 .padding()
+                
+                if showConfigurationView {
+                    Color.black.opacity(0.5)
+                        .edgesIgnoringSafeArea(.all)
+                        .onTapGesture {
+                            showConfigurationView = false
+                        }
+                    VStack(spacing: 20) {
+                        ConfigurationView(isPresented: $showConfigurationView).environmentObject(viewModel)
+                    }
+                    .offset(y: UIScreen.screenHeight / 2 - 450)
+                }
             }
             .ignoresSafeArea()
         }

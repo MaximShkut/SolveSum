@@ -14,15 +14,92 @@ class GameViewModel: ObservableObject {
     @Published var score: Int = 0
     @Published var cells: [CellItem] = []
     
-    func makeEasyConfiguration(){
-        gameConfiguration.boardSize = 4
+    
+    func startGame() {
+        score = 0
+        generateCells()
+        updateTargetNumber()
+        calculateCellSize()
     }
     
-    func getCellInColumn(column: Int) -> [CellItem] {
+    func makeEasyConfiguration() {
+        gameConfiguration.boardSize = 4
+        gameConfiguration.maxCellValue = 6
+    }
+    
+    func makeMediumConfiguration() {
+        gameConfiguration.boardSize = 6
+        gameConfiguration.maxCellValue = 10
+    }
+    
+    func makeHardConfiguration() {
+        gameConfiguration.boardSize = 7
+        gameConfiguration.maxCellValue = 14
+    }
+    
+    func makeSuperHardConfiguration() {
+        gameConfiguration.boardSize = 8
+        gameConfiguration.maxCellValue = 20
+    }
+    
+    func checkProgress() {
+        let selectedSum = sumSelectedNumbers()
+        if selectedSum == self.targetNumber {
+            let allCells = cells.compactMap { $0 }.filter { $0.isSelected }
+            for cell in allCells {
+                if let index = cells.firstIndex(of: cell){
+                    cells[index].isDeleted = true
+                    cells[index].isSelected = false
+                }
+            }
+            movingCells()
+            
+            withAnimation(.linear(duration: 1.0)) {
+                score += targetNumber
+            }
+            
+            updateTargetNumber()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
+                self.rewriteTable()
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
+                self.addButtonTapped()
+            }
+            
+        }
+    }
+    
+    func getCell(row: Int, column: Int) -> CellItem? {
+        return cells.first(where: { $0.row == row && $0.column == column })
+    }
+    
+    func showHint() {
+        let selectedCells = cells.filter { !$0.isDeleted }
+        let targetSum = targetNumber
+        
+        // Find combinations of cells that sum up to the target number
+        var hintCells: [CellItem] = []
+        findCombinations(cells: selectedCells, target: targetSum, currentSum: 0, startIndex: 0, currentCombination: [], hintCells: &hintCells)
+        
+        withAnimation(.easeInOut(duration: 1)) {
+            for cell in hintCells {
+                if let index = cells.firstIndex(of: cell) {
+                    cells[index].isHint.toggle()
+                }
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                withAnimation(.easeInOut(duration: 1)) {
+                    self.hideHint()
+                }
+            }
+        }
+    }
+    
+    private func getCellInColumn(column: Int) -> [CellItem] {
         return cells.filter({$0.column == column}).sorted{ $0.row > $1.row}
     }
     
-    func movingCells() {
+    private func movingCells() {
         for column in 0..<gameConfiguration.boardSize{
             var value: Int = 0
             for  cell in getCellInColumn(column: column){
@@ -40,7 +117,7 @@ class GameViewModel: ObservableObject {
         }
     }
     
-    func rewriteField(){
+    private func rewriteTable(){
         for column in 0..<gameConfiguration.boardSize{
             var value: Int = 0
             for  cell in getCellInColumn(column: column){
@@ -59,15 +136,15 @@ class GameViewModel: ObservableObject {
         }
     }
     
-    func addButtonTapped() {
+    private func addButtonTapped() {
         // add once button
-//        if let deletedCells = cells.filter({ $0.isDeleted }).sorted(by: {$0.row > $1.row} ).first{
-//            if let index = cells.firstIndex(of:  deletedCells){
-//                cells[index].value = Int.random(in: 1...config.maxCellValue)
-//                cells[index].isDeleted = false
-//                cells[index].isHint = false
-//            }
-//        }
+        //        if let deletedCells = cells.filter({ $0.isDeleted }).sorted(by: {$0.row > $1.row} ).first{
+        //            if let index = cells.firstIndex(of:  deletedCells){
+        //                cells[index].value = Int.random(in: 1...config.maxCellValue)
+        //                cells[index].isDeleted = false
+        //                cells[index].isHint = false
+        //            }
+        //        }
         
         //add all button
         let allCells = cells.filter { $0.isDeleted }
@@ -80,39 +157,11 @@ class GameViewModel: ObservableObject {
         }
     }
     
-    func checkProgress() {
-        
-        let selectedSum = sumSelectedNumbers()
-        if selectedSum == self.targetNumber {
-            let allCells = cells.compactMap { $0 }.filter { $0.isSelected }
-            for cell in allCells {
-                if let index = cells.firstIndex(of: cell){
-                    cells[index].isDeleted = true
-                    cells[index].isSelected = false
-                }
-            }
-            movingCells()
-            
-            withAnimation(.linear(duration: 1.0)) {
-                score += targetNumber
-            }
-            
-            updateTargetNumber()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
-                self.rewriteField()
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
-                self.addButtonTapped()
-            }
-            
-        }
-    }
-    
-    func sumSelectedNumbers () -> Int {
+    private func sumSelectedNumbers () -> Int {
         cells.compactMap {$0 }.filter { $0.isSelected && !$0.isDeleted  }.reduce(0) { $0 + ($1.value ) }
     }
     
-    func updateTargetNumber() {
+    private func updateTargetNumber() {
         var arr = cells.compactMap { $0 }
         var sum = 0
         var cellsCount = 0
@@ -127,7 +176,7 @@ class GameViewModel: ObservableObject {
         self.targetNumber = sum
     }
     
-    func generateCells() {
+    private func generateCells() {
         self.cells = []
         for row in 0..<gameConfiguration.boardSize {
             for col in 0..<gameConfiguration.boardSize {
@@ -138,11 +187,9 @@ class GameViewModel: ObservableObject {
         }
     }
     
-    func getCell(row: Int, column: Int) -> CellItem? {
-        return cells.first(where: { $0.row == row && $0.column == column })
-    }
     
-    func calculateCellSize() {
+    
+    private func calculateCellSize() {
         let boardSize = gameConfiguration.boardSize
         var widthScreen = UIScreen.screenWidth
         widthScreen -= 20 * CGFloat(2)
@@ -150,43 +197,19 @@ class GameViewModel: ObservableObject {
         self.cellSize = widthScreen / CGFloat(boardSize)
     }
     
-    func showHint() {
-        let selectedCells = cells.filter { !$0.isDeleted }
-        let targetSum = targetNumber
-        
-        // Find combinations of cells that sum up to the target number
-        var hintCells: [CellItem] = []
-        findCombinations(cells: selectedCells, target: targetSum, currentSum: 0, startIndex: 0, currentCombination: [], hintCells: &hintCells)
-        
-            withAnimation(.easeInOut(duration: 1)) {
-                for cell in hintCells {
-                    if let index = cells.firstIndex(of: cell) {
-                        cells[index].isHint.toggle()
-                    }
-                }
-            
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                withAnimation(.easeInOut(duration: 1)) {
-                    self.hideHint()
-                }
-            }
-        }
-    }
-
-
-    func hideHint() {
+    
+    
+    
+    private func hideHint() {
         let selectedCells = cells.filter { !$0.isDeleted }
         for cell in selectedCells {
             if let index = self.cells.firstIndex(of: cell) {
                 self.cells[index].isHint = false
             }
         }
-        
     }
-
     
-    func findCombinations(cells: [CellItem], target: Int, currentSum: Int, startIndex: Int, currentCombination: [CellItem], hintCells: inout [CellItem]) {
+    private func findCombinations(cells: [CellItem], target: Int, currentSum: Int, startIndex: Int, currentCombination: [CellItem], hintCells: inout [CellItem]) {
         if currentSum == target {
             hintCells.append(contentsOf: currentCombination)
             return
@@ -207,17 +230,5 @@ class GameViewModel: ObservableObject {
                 break
             }
         }
-    }
-
-    
-    func startShowHint() {
-        showHint()
-    }
-    
-    func startGame() {
-        score = 0
-        generateCells()
-        updateTargetNumber()
-        calculateCellSize()
     }
 }
