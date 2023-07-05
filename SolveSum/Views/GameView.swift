@@ -7,45 +7,68 @@
 
 import SwiftUI
 
-struct StartGame: View {
+struct GameView: View {
     @EnvironmentObject var viewModel: GameViewModel
+    
+    @State private var isTimerStart: Bool = false
+    
+    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
     var body: some View{
         ZStack {
             LinearGradient(gradient: Gradient(colors: [Color.purple, Color.blue]), startPoint: .top, endPoint: .bottom)
+            if viewModel.gameConfiguration.countDownTimer > 10{
+                VStack{
+                    LinearGradient(
+                        colors: [.white, .clear, .clear],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    .mask(
+                        Text("\(viewModel.formattedTime(viewModel.gameConfiguration.countDownTimer))")
+                            .onReceive(timer){ _ in
+                                if viewModel.gameConfiguration.countDownTimer > 0 && isTimerStart{
+                                    viewModel.gameConfiguration.countDownTimer -= 1
+                                } else {
+                                    isTimerStart = false
+                                }
+                            }
+                            .font(.system(size: 80, weight: .bold))
+                            .offset(y: -300)
+                    )
+                    
+                }
+            }
             
             VStack(spacing: 10) {
-                GeometryReader { geometry in
-                    HStack {
-                        VStack {
-                            Text("Score")
-                            Text("\(viewModel.score)")
-                                .font(.largeTitle)
-                                .fontWeight(.bold)
-                                .foregroundColor(.white)
-                                .frame(width: geometry.size.width * 0.2)
-                        }
-                        
-                        Text("\(viewModel.targetNumber)")
+                HStack {
+                    VStack {
+                        Text("Score")
+                        Text("\(viewModel.score)")
                             .font(.largeTitle)
                             .fontWeight(.bold)
-                            .frame(width: geometry.size.width * 0.5)
-                        
-                        Button(action: {
-                            viewModel.showHint()
-                        }, label: {
-                            Image(systemName: "lightbulb")
-                                .font(.title)
-                                .foregroundColor(.yellow)
-                        })
-                        .padding(8)
-                        .background(.indigo)
-                        .clipShape(Circle())
-                        .frame(width: geometry.size.width * 0.20)
+                            .foregroundColor(.white)
+                            .frame(width:UIScreen.screenWidth / 3)
                     }
-                    .padding()
+                    
+                    Text("\(viewModel.targetNumber)")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .frame(width:UIScreen.screenWidth / 3)
+                    
+                    Button(action: {
+                        viewModel.showHint()
+                    }, label: {
+                        Image(systemName: "lightbulb")
+                            .font(.title)
+                            .foregroundColor(.yellow)
+                    })
+                    .padding(8)
+                    .background(.indigo)
+                    .clipShape(Circle())
+                    .frame(width:UIScreen.screenWidth / 3)
                 }
-                .frame(height: 70)
+                .padding()
                 
                 ForEach(0..<viewModel.gameConfiguration.boardSize, id: \.self) { row in
                     HStack(spacing: 10) {
@@ -111,6 +134,10 @@ struct StartGame: View {
             }
             .onAppear{
                 viewModel.startGame()
+                isTimerStart = true
+            }
+            .onDisappear{
+                viewModel.gameConfiguration.countDownTimer = 0
             }
         }
         .ignoresSafeArea()

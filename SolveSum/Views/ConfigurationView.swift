@@ -60,15 +60,39 @@ struct ConfigurationView: View {
                 Button(action: {
                     isPressed.toggle()
                     if isPressed {
-                        viewModel.makeSuperHardConfiguration()
+                        viewModel.makeMediumConfiguration()
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2){
                             isPresented = false
                         }
                     }
                 }, label: {
-                    Text("SuperHard")
+                    VStack {
+                        Text("Infinity")
+                            .offset(y: +40)
+                        Slider(value: Binding<Double>(
+                            get: { Double(viewModel.gameConfiguration.countDownTimer) },
+                            set: { viewModel.gameConfiguration.countDownTimer = Int($0) }
+                        ), in: 60...600, step: 60)
+                        .padding()
+                        Text("\(viewModel.gameConfiguration.countDownTimer / 60)")
+                            .offset(y: -40)
+                    }
+                    
                 })
                 .buttonStyle(StyleForButtonInCongigurationView())
+                
+//                Button(action: {
+//                    isPressed.toggle()
+//                    if isPressed {
+//                        viewModel.makeSuperHardConfiguration()
+//                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2){
+//                            isPresented = false
+//                        }
+//                    }
+//                }, label: {
+//                    Text("SuperHard")
+//                })
+//                .buttonStyle(StyleForButtonInCongigurationView())
             }
             .padding()
         }

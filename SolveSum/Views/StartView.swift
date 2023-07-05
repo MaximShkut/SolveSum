@@ -17,7 +17,7 @@ struct StartView: View {
                 LinearGradient(gradient: Gradient(colors: [Color.purple, Color.blue]), startPoint: .top, endPoint: .bottom)
                 
                 VStack(spacing: 20) {
-                    NavigationLink(destination: StartGame().environmentObject(viewModel)) {
+                    NavigationLink(destination: GameView().environmentObject(viewModel)) {
                         Text("Start Game")
                     }
                     .buttonStyle(StyleForButtonInPreviewScreen())

@@ -23,7 +23,7 @@ struct StyleForButtonInPreviewScreen: ButtonStyle {
 struct StyleForButtonInCongigurationView: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .padding(EdgeInsets(top: 12, leading: 24, bottom: 12, trailing: 24))
+            .frame(width: 300, height: 50)
             .font(.system(size: 20, weight: .bold, design: .rounded))
             .foregroundColor(.purple)
             .background(
@@ -31,7 +31,7 @@ struct StyleForButtonInCongigurationView: ButtonStyle {
                     .stroke(Color.purple, lineWidth: 5)
                     .background(Color.white)
                     .cornerRadius(20)
-                    .scaleEffect(configuration.isPressed ? 0.8 : 1.0) // Изменение размера при нажатии
+                    .scaleEffect(configuration.isPressed ? 0.95 : 1.0) // Изменение размера при нажатии
             )
     }
 }

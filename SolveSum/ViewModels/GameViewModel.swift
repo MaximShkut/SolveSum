@@ -13,7 +13,13 @@ class GameViewModel: ObservableObject {
     @Published var targetNumber: Int = 0
     @Published var score: Int = 0
     @Published var cells: [CellItem] = []
+    @Published var selectedTime: Int = 0
     
+    func formattedTime(_ time: Int) -> String {
+        let minutes = time / 60
+        let seconds = time % 60
+        return String(format: "%02d:%02d", minutes, seconds)
+    }
     
     func startGame() {
         score = 0
