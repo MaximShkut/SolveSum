@@ -99,7 +99,13 @@ class GameViewModel: ObservableObject {
         
         // Find combinations of cells that sum up to the target number
         var hintCells: [CellItem] = []
-        findCombinations(cells: selectedCells, target: targetSum, currentSum: 0, startIndex: 0, currentCombination: [], hintCells: &hintCells)
+        
+        if gameConfiguration.arithmeticSign == "+" {
+            findCombinationsForPlus(cells: selectedCells, target: targetSum, currentSum: 0, startIndex: 0, currentCombination: [], hintCells: &hintCells)
+        } else if gameConfiguration.arithmeticSign == "*" {
+            findCombinationsForMyltiplication(cells: selectedCells, target: targetSum, currentProduct: 1, startIndex: 0, currentCombination: [], hintCells: &hintCells)
+        }
+        
         
         withAnimation(.easeInOut(duration: 1)) {
             for cell in hintCells {
@@ -257,7 +263,7 @@ class GameViewModel: ObservableObject {
         }
     }
     
-    private func findCombinations(cells: [CellItem], target: Int, currentSum: Int, startIndex: Int, currentCombination: [CellItem], hintCells: inout [CellItem]) {
+    private func findCombinationsForPlus(cells: [CellItem], target: Int, currentSum: Int, startIndex: Int, currentCombination: [CellItem], hintCells: inout [CellItem]) {
         if currentSum == target {
             hintCells.append(contentsOf: currentCombination)
             return
@@ -272,11 +278,35 @@ class GameViewModel: ObservableObject {
             newCombination.append(cells[i])
             
             let newSum = currentSum + cells[i].value
-            findCombinations(cells: cells, target: target, currentSum: newSum, startIndex: i + 1, currentCombination: newCombination, hintCells: &hintCells)
+            findCombinationsForPlus(cells: cells, target: target, currentSum: newSum, startIndex: i + 1, currentCombination: newCombination, hintCells: &hintCells)
             
             if hintCells.count > 0 {
                 break
             }
         }
     }
+    
+    private func findCombinationsForMyltiplication(cells: [CellItem], target: Int, currentProduct: Int, startIndex: Int, currentCombination: [CellItem], hintCells: inout [CellItem]) {
+        if currentProduct == target {
+            hintCells.append(contentsOf: currentCombination)
+            return
+        }
+        
+        if currentProduct > target || startIndex >= cells.count {
+            return
+        }
+        
+        for i in startIndex..<cells.count {
+            var newCombination = currentCombination
+            newCombination.append(cells[i])
+            
+            let newProduct = currentProduct * cells[i].value
+            findCombinationsForMyltiplication(cells: cells, target: target, currentProduct: newProduct, startIndex: i + 1, currentCombination: newCombination, hintCells: &hintCells)
+            
+            if hintCells.count > 0 {
+                break
+            }
+        }
+    }
+
 }
