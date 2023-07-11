@@ -18,6 +18,33 @@ struct ConfigurationView: View {
                 .font(.title)
                 .padding()
             VStack(spacing: 8) {
+                HStack(spacing: 8){
+                    Button(action: {
+                        isPressed.toggle()
+                        if isPressed {
+                            viewModel.gameConfiguration.arithmeticSign = "+"
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2){
+                                isPresented = false
+                            }
+                        }
+                    }, label: {
+                        Text("+")
+                    })
+                    .buttonStyle(StyleForButtonInCongigurationViewForSign())
+                    
+                    Button(action: {
+                        isPressed.toggle()
+                        if isPressed {
+                            viewModel.gameConfiguration.arithmeticSign = "*"
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2){
+                                isPresented = false
+                            }
+                        }
+                    }, label: {
+                        Text("*")
+                    })
+                    .buttonStyle(StyleForButtonInCongigurationViewForSign())
+                }
                 Button(action: {
                     isPressed.toggle()
                     if isPressed {
@@ -72,7 +99,7 @@ struct ConfigurationView: View {
                         Slider(value: Binding<Double>(
                             get: { Double(viewModel.gameConfiguration.countDownTimer) },
                             set: { viewModel.gameConfiguration.countDownTimer = Int($0) }
-                        ), in: 60...600, step: 60)
+                        ), in: 0...600, step: 10)
                         .padding()
                         Text("\(viewModel.gameConfiguration.countDownTimer / 60)")
                             .offset(y: -40)

@@ -24,8 +24,13 @@ class GameViewModel: ObservableObject {
     func startGame() {
         score = 0
         generateCells()
-        updateTargetNumber()
         calculateCellSize()
+        if gameConfiguration.arithmeticSign == "+" {
+            updateTargetNumberForPlus()
+        } else if gameConfiguration.arithmeticSign == "*" {
+            updateTargetNumberForMultiplication()
+        }
+        
     }
     
     func makeEasyConfiguration() {
@@ -49,7 +54,12 @@ class GameViewModel: ObservableObject {
     }
     
     func checkProgress() {
-        let selectedSum = sumSelectedNumbers()
+        var selectedSum: Int = 0
+        if gameConfiguration.arithmeticSign == "+" {
+            selectedSum = sumSelectedNumbers()
+        } else if gameConfiguration.arithmeticSign == "*" {
+            selectedSum = sumMyltiplicationSelectedNumbers()
+        }
         if selectedSum == self.targetNumber {
             let allCells = cells.compactMap { $0 }.filter { $0.isSelected }
             for cell in allCells {
@@ -64,14 +74,18 @@ class GameViewModel: ObservableObject {
                 score += targetNumber
             }
             
-            updateTargetNumber()
+            if gameConfiguration.arithmeticSign == "+" {
+                updateTargetNumberForPlus()
+            } else if gameConfiguration.arithmeticSign == "*" {
+                updateTargetNumberForMultiplication()
+            }
+            
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
                 self.rewriteTable()
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
                 self.addButtonTapped()
             }
-            
         }
     }
     
@@ -142,21 +156,25 @@ class GameViewModel: ObservableObject {
         }
     }
     
-    private func addButtonTapped() {
-        // add once button
-        //        if let deletedCells = cells.filter({ $0.isDeleted }).sorted(by: {$0.row > $1.row} ).first{
-        //            if let index = cells.firstIndex(of:  deletedCells){
-        //                cells[index].value = Int.random(in: 1...config.maxCellValue)
-        //                cells[index].isDeleted = false
-        //                cells[index].isHint = false
-        //            }
-        //        }
+    func addButtonTapped() {
+         //add once button
+//                if let deletedCells = cells.filter({ $0.isDeleted }).sorted(by: {$0.row > $1.row} ).first{
+//                    if let index = cells.firstIndex(of:  deletedCells){
+//                        cells[index].value = Int.random(in: 1...gameConfiguration.maxCellValue)
+//                        cells[index].isDeleted = false
+//                        cells[index].isHint = false
+//                    }
+//                }
         
         //add all button
         let allCells = cells.filter { $0.isDeleted }
         for cell in allCells {
             if let index = cells.firstIndex(of: cell){
-                cells[index].value = Int.random(in: 1...gameConfiguration.maxCellValue)
+                if gameConfiguration.arithmeticSign == "+" {
+                    cells[index].value = Int.random(in: 1...gameConfiguration.maxCellValue)
+                } else if gameConfiguration.arithmeticSign == "*" {
+                    cells[index].value = Int.random(in: 2...gameConfiguration.maxCellValue)
+                }
                 cells[index].isDeleted = false
                 cells[index].isHint = false
             }
@@ -167,7 +185,26 @@ class GameViewModel: ObservableObject {
         cells.compactMap {$0 }.filter { $0.isSelected && !$0.isDeleted  }.reduce(0) { $0 + ($1.value ) }
     }
     
-    private func updateTargetNumber() {
+    private func sumMyltiplicationSelectedNumbers () -> Int {
+        cells.compactMap {$0 }.filter { $0.isSelected && !$0.isDeleted  }.reduce(1) { $0 * ($1.value ) }
+    }
+    
+    private func updateTargetNumberForMultiplication() {
+        var arr = cells.compactMap { $0 }
+        var product = 1
+        var cellsCount = 0
+        
+        // Умножаем числа, пока произведение меньше максимального значения ячейки и количество выбранных ячеек не превышает максимальное
+        while product < gameConfiguration.maxCellValue && cellsCount < gameConfiguration.maxCellsToSelect {
+            arr = arr.shuffled()
+            product *= arr.popLast()!.value
+            cellsCount += 1
+        }
+        
+        self.targetNumber = product
+    }
+    
+    private func updateTargetNumberForPlus() {
         var arr = cells.compactMap { $0 }
         var sum = 0
         var cellsCount = 0
@@ -186,7 +223,12 @@ class GameViewModel: ObservableObject {
         self.cells = []
         for row in 0..<gameConfiguration.boardSize {
             for col in 0..<gameConfiguration.boardSize {
-                let value = Int.random(in: 1...gameConfiguration.maxCellValue)
+                var value = 0
+                if gameConfiguration.arithmeticSign == "+" {
+                    value = Int.random(in: 1...gameConfiguration.maxCellValue)
+                } else if gameConfiguration.arithmeticSign == "*" {
+                    value = Int.random(in: 2...gameConfiguration.maxCellValue)
+                }
                 let cell = CellItem(value: value, row: row, column: col)
                 cells.append(cell)
             }

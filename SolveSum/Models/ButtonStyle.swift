@@ -29,7 +29,23 @@ struct StyleForButtonInCongigurationView: ButtonStyle {
             .background(
                 Capsule()
                     .stroke(Color.purple, lineWidth: 5)
-                    .background(Color.white)
+                    .background(Color.yellow)
+                    .cornerRadius(20)
+                    .scaleEffect(configuration.isPressed ? 0.95 : 1.0) // Изменение размера при нажатии
+            )
+    }
+}
+
+struct StyleForButtonInCongigurationViewForSign: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .frame(width: 150, height: 50)
+            .font(.system(size: 20, weight: .bold, design: .rounded))
+            .foregroundColor(.purple)
+            .background(
+                Capsule()
+                    .stroke(Color.purple, lineWidth: 5)
+                    .background(Color.yellow)
                     .cornerRadius(20)
                     .scaleEffect(configuration.isPressed ? 0.95 : 1.0) // Изменение размера при нажатии
             )

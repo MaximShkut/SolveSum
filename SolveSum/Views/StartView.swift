@@ -14,24 +14,25 @@ struct StartView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                LinearGradient(gradient: Gradient(colors: [Color.purple, Color.blue]), startPoint: .top, endPoint: .bottom)
+                LinearGradient(gradient: Gradient(colors: [Color.red, Color.blue]), startPoint: .top, endPoint: .bottom)
                 
                 VStack(spacing: 20) {
                     NavigationLink(destination: GameView().environmentObject(viewModel)) {
                         Text("Start Game")
                     }
                     .buttonStyle(StyleForButtonInPreviewScreen())
-                    Button(action: {
-                        //exit(0)
-                    }, label: {
-                        Text("Exit")
-                    })
-                    .buttonStyle(StyleForButtonInPreviewScreen())
                     
                     Button(action: {
                         showConfigurationView.toggle()
                     }, label: {
                         Text("Configuration")
+                    })
+                    .buttonStyle(StyleForButtonInPreviewScreen())
+                    
+                    Button(action: {
+                        //exit(0)
+                    }, label: {
+                        Text("Exit")
                     })
                     .buttonStyle(StyleForButtonInPreviewScreen())
                 }
