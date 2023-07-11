@@ -11,7 +11,8 @@ struct GameView: View {
     @EnvironmentObject var viewModel: GameViewModel
     
     @State private var isTimerStart: Bool = false
-    @State private var isShowingAlert = false
+    @State private var isShowingAlert: Bool = false
+    @State private var countDowntimer = 0
     
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
@@ -27,23 +28,13 @@ struct GameView: View {
                     )
                     .mask(
                         Text("\(viewModel.formattedTime(viewModel.gameConfiguration.countDownTimer))")
-                            .onReceive(timer){ _ in
-                                if viewModel.gameConfiguration.countDownTimer > 0 && isTimerStart{
-                                    viewModel.gameConfiguration.countDownTimer -= 1
-                                } else {
-                                    isTimerStart = false
-                                    isShowingAlert = true
-                                }
-                            }
                             .font(.system(size: 80, weight: .bold))
                             .foregroundColor(.black)
                             .frame(width: 300) // Установите фиксированную ширину контейнера
                             .offset(y: -300)
-                            
                     )
                 }
             }
-                
             
             VStack(spacing: 10) {
                 HStack {
@@ -137,14 +128,34 @@ struct GameView: View {
 //                    .cornerRadius(10)
                 }
             }
-            .onAppear{
-                viewModel.startGame()
-                isTimerStart = true
-            }
-            .onDisappear{
-                viewModel.gameConfiguration.countDownTimer = 0
-            }
+//            .onDisappear{
+//                viewModel.gameConfiguration.countDownTimer = 0
+//            }
         }
         .ignoresSafeArea()
+        .onAppear{
+            viewModel.startGame()
+            isTimerStart = true
+            countDowntimer = viewModel.gameConfiguration.countDownTimer
+        }
+        .onReceive(timer){ _ in
+            if viewModel.gameConfiguration.countDownTimer > 0 && isTimerStart{
+                viewModel.gameConfiguration.countDownTimer -= 1
+            } else {
+                isTimerStart = false
+                isShowingAlert = true
+            }
+        }
+        .alert(isPresented: $isShowingAlert) {
+            Alert(
+                title: Text("Congatulations"),
+                message: Text("Your score is \(viewModel.score)"),
+                dismissButton: .default(Text("Reset")) {
+                    viewModel.startGame()
+                    isTimerStart = true
+                    viewModel.gameConfiguration.countDownTimer = countDowntimer
+                }
+            )
+        }
     }
 }
