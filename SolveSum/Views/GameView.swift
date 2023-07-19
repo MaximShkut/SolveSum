@@ -18,7 +18,10 @@ struct GameView: View {
     
     var body: some View{
         ZStack {
-            LinearGradient(gradient: Gradient(colors: [Color.red, Color.blue]), startPoint: .top, endPoint: .bottom)
+            //LinearGradient(gradient: Gradient(colors: [Color.red, Color.blue]), startPoint: .top, endPoint: .bottom)
+            Color.mint.opacity(0.4)
+                .ignoresSafeArea()
+            
             if viewModel.gameConfiguration.countDownTimer > 0 {
                 VStack{
                     LinearGradient(
@@ -30,7 +33,7 @@ struct GameView: View {
                         Text("\(viewModel.formattedTime(viewModel.gameConfiguration.countDownTimer))")
                             .font(.system(size: 80, weight: .bold))
                             .foregroundColor(.black)
-                            .frame(width: 300) // Установите фиксированную ширину контейнера
+                            .frame(width: 300) 
                             .offset(y: -300)
                     )
                 }
@@ -44,13 +47,13 @@ struct GameView: View {
                             .font(.largeTitle)
                             .fontWeight(.bold)
                             .foregroundColor(.white)
-                            .frame(width:UIScreen.screenWidth / 3)
+                            .frame(width:UIScreen.width / 3)
                     }
                     
                     Text("\(viewModel.targetNumber)")
                         .font(.largeTitle)
                         .fontWeight(.bold)
-                        .frame(width:UIScreen.screenWidth / 3)
+                        .frame(width:UIScreen.width / 3)
                     
                     Button(action: {
                         viewModel.showHint()
@@ -62,7 +65,7 @@ struct GameView: View {
                     .padding(8)
                     .background(.indigo)
                     .clipShape(Circle())
-                    .frame(width:UIScreen.screenWidth / 3)
+                    .frame(width:UIScreen.width / 3)
                 }
                 .padding()
                 
@@ -116,23 +119,10 @@ struct GameView: View {
                             .background(Color.red)
                             .cornerRadius(10)
                     }
-//                    Button(action: {
-//                        viewModel.addButtonTapped()
-//                    }, label: {
-//                        Text("Add Button")
-//                    })
-//                    .font(.headline)
-//                    .padding()
-//                    .foregroundColor(.white)
-//                    .background(Color.green)
-//                    .cornerRadius(10)
                 }
             }
-//            .onDisappear{
-//                viewModel.gameConfiguration.countDownTimer = 0
-//            }
+            .offset(y: -50)
         }
-        .ignoresSafeArea()
         .onAppear{
             viewModel.startGame()
             isTimerStart = true
@@ -146,16 +136,22 @@ struct GameView: View {
                 isShowingAlert = true
             }
         }
-        .alert(isPresented: $isShowingAlert) {
-            Alert(
-                title: Text("Congatulations"),
-                message: Text("Your score is \(viewModel.score)"),
-                dismissButton: .default(Text("Reset")) {
-                    viewModel.startGame()
-                    isTimerStart = true
-                    viewModel.gameConfiguration.countDownTimer = countDowntimer
-                }
-            )
-        }
+//        .alert(isPresented: $isShowingAlert) {
+//            Alert(
+//                title: Text("Congatulations"),
+//                message: Text("Your score is \(viewModel.score)"),
+//                dismissButton: .default(Text("Reset")) {
+//                    viewModel.startGame()
+//                    isTimerStart = true
+//                    viewModel.gameConfiguration.countDownTimer = countDowntimer
+//                }
+//            )
+//        }
+    }
+}
+
+struct GameView_Previews: PreviewProvider {
+    static var previews: some View {
+        StartView()
     }
 }

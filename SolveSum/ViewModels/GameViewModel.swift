@@ -70,7 +70,7 @@ class GameViewModel: ObservableObject {
             }
             movingCells()
             
-            withAnimation(.linear(duration: 1.0)) {
+            withAnimation(.linear(duration: 0.5)) {
                 score += targetNumber
             }
             
@@ -80,10 +80,10 @@ class GameViewModel: ObservableObject {
                 updateTargetNumberForMultiplication()
             }
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3){
                 self.rewriteTable()
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3){
                 self.addButtonTapped()
             }
         }
@@ -183,6 +183,10 @@ class GameViewModel: ObservableObject {
                 }
                 cells[index].isDeleted = false
                 cells[index].isHint = false
+                cells[index].offset = -cellSize
+                withAnimation(.easeOut) {
+                    cells[index].offset = 0
+                }
             }
         }
     }
@@ -245,7 +249,7 @@ class GameViewModel: ObservableObject {
     
     private func calculateCellSize() {
         let boardSize = gameConfiguration.boardSize
-        var widthScreen = UIScreen.screenWidth
+        var widthScreen = UIScreen.width
         widthScreen -= 20 * CGFloat(2)
         widthScreen -=  CGFloat(10 * (boardSize - 1))
         self.cellSize = widthScreen / CGFloat(boardSize)

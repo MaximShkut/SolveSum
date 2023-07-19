@@ -11,6 +11,8 @@ struct GameConfiguration {
     var maxCellValue: Int = 10
     var boardSize: Int = 6
     var maxCellsToSelect: Int = 5
+    
+    
     var countDownTimer: Int = 0
     var arithmeticSign: String = "+"
 }
