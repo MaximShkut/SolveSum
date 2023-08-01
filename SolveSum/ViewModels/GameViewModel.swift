@@ -25,39 +25,19 @@ class GameViewModel: ObservableObject {
         score = 0
         generateCells()
         calculateCellSize()
-        if gameConfiguration.arithmeticSign == "+" {
+        if gameConfiguration.arithmeticSign == "Plus" {
             updateTargetNumberForPlus()
-        } else if gameConfiguration.arithmeticSign == "*" {
+        } else if gameConfiguration.arithmeticSign == "Multiplication" {
             updateTargetNumberForMultiplication()
         }
         
     }
     
-    func makeEasyConfiguration() {
-        gameConfiguration.boardSize = 4
-        gameConfiguration.maxCellValue = 6
-    }
-    
-    func makeMediumConfiguration() {
-        gameConfiguration.boardSize = 6
-        gameConfiguration.maxCellValue = 10
-    }
-    
-    func makeHardConfiguration() {
-        gameConfiguration.boardSize = 7
-        gameConfiguration.maxCellValue = 14
-    }
-    
-    func makeSuperHardConfiguration() {
-        gameConfiguration.boardSize = 8
-        gameConfiguration.maxCellValue = 20
-    }
-    
     func checkProgress() {
         var selectedSum: Int = 0
-        if gameConfiguration.arithmeticSign == "+" {
+        if gameConfiguration.arithmeticSign == "Plus" {
             selectedSum = sumSelectedNumbers()
-        } else if gameConfiguration.arithmeticSign == "*" {
+        } else if gameConfiguration.arithmeticSign == "Multiplication" {
             selectedSum = sumMyltiplicationSelectedNumbers()
         }
         if selectedSum == self.targetNumber {
@@ -74,19 +54,28 @@ class GameViewModel: ObservableObject {
                 score += targetNumber
             }
             
-            if gameConfiguration.arithmeticSign == "+" {
-                updateTargetNumberForPlus()
-            } else if gameConfiguration.arithmeticSign == "*" {
-                updateTargetNumberForMultiplication()
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3){
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1){
                 self.rewriteTable()
             }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2){
+                self.changeTargetNumberOverTime()
+                self.addCell()
+            }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3){
-                self.addButtonTapped()
+                if self.gameConfiguration.arithmeticSign == "Plus" {
+                    self.updateTargetNumberForPlus()
+                } else if self.gameConfiguration.arithmeticSign == "Multiplication" {
+                    self.updateTargetNumberForMultiplication()
+                }
             }
         }
+    }
+    
+    func changeTargetNumberOverTime() {
+        var timer = 120
+        var remainingTime = gameConfiguration.countDownTimer
+        var changer = (timer - remainingTime) / 10
+        gameConfiguration.maxCellValue = 10 + (2 * changer)
     }
     
     func getCell(row: Int, column: Int) -> CellItem? {
@@ -97,12 +86,11 @@ class GameViewModel: ObservableObject {
         let selectedCells = cells.filter { !$0.isDeleted }
         let targetSum = targetNumber
         
-        // Find combinations of cells that sum up to the target number
         var hintCells: [CellItem] = []
         
-        if gameConfiguration.arithmeticSign == "+" {
+        if gameConfiguration.arithmeticSign == "Plus" {
             findCombinationsForPlus(cells: selectedCells, target: targetSum, currentSum: 0, startIndex: 0, currentCombination: [], hintCells: &hintCells)
-        } else if gameConfiguration.arithmeticSign == "*" {
+        } else if gameConfiguration.arithmeticSign == "Multiplication" {
             findCombinationsForMyltiplication(cells: selectedCells, target: targetSum, currentProduct: 1, startIndex: 0, currentCombination: [], hintCells: &hintCells)
         }
         
@@ -134,7 +122,7 @@ class GameViewModel: ObservableObject {
                         value += 1
                     }
                     else{
-                        withAnimation(.easeOut(duration: 0.3)) {
+                        withAnimation(.easeOut(duration: 0.2)) {
                             cells[index].offset = CGFloat(value) * (self.cellSize + 10)
                         }
                     }
@@ -162,30 +150,26 @@ class GameViewModel: ObservableObject {
         }
     }
     
-    func addButtonTapped() {
-         //add once button
-//                if let deletedCells = cells.filter({ $0.isDeleted }).sorted(by: {$0.row > $1.row} ).first{
-//                    if let index = cells.firstIndex(of:  deletedCells){
-//                        cells[index].value = Int.random(in: 1...gameConfiguration.maxCellValue)
-//                        cells[index].isDeleted = false
-//                        cells[index].isHint = false
-//                    }
-//                }
-        
-        //add all button
+    func addCell() {
         let allCells = cells.filter { $0.isDeleted }
         for cell in allCells {
             if let index = cells.firstIndex(of: cell){
-                if gameConfiguration.arithmeticSign == "+" {
-                    cells[index].value = Int.random(in: 1...gameConfiguration.maxCellValue)
-                } else if gameConfiguration.arithmeticSign == "*" {
-                    cells[index].value = Int.random(in: 2...gameConfiguration.maxCellValue)
-                }
-                cells[index].isDeleted = false
-                cells[index].isHint = false
-                cells[index].offset = -cellSize
-                withAnimation(.easeOut) {
-                    cells[index].offset = 0
+                if gameConfiguration.countAddCell > 0 {
+                    if gameConfiguration.arithmeticSign == "Plus" {
+                        cells[index].value = Int.random(in: 1...gameConfiguration.maxCellValue)
+                    } else if gameConfiguration.arithmeticSign == "Multiplication" {
+                        cells[index].value = Int.random(in: 2...gameConfiguration.maxCellValue)
+                    }
+                    cells[index].isDeleted = false
+                    cells[index].isHint = false
+                    cells[index].offset = -cellSize
+                    cells[index].cellOpacity = 0
+                    withAnimation(.easeOut) {
+                        cells[index].offset = 0
+                        cells[index].cellOpacity = 1
+                    }
+                    
+                    gameConfiguration.countAddCell -= 1
                 }
             }
         }
@@ -200,12 +184,15 @@ class GameViewModel: ObservableObject {
     }
     
     private func updateTargetNumberForMultiplication() {
-        var arr = cells.compactMap { $0 }
+        var arr = cells.compactMap { $0 }.filter { !$0.isDeleted }
         var product = 1
         var cellsCount = 0
         
         // Умножаем числа, пока произведение меньше максимального значения ячейки и количество выбранных ячеек не превышает максимальное
         while product < gameConfiguration.maxCellValue && cellsCount < gameConfiguration.maxCellsToSelect {
+            if arr.isEmpty {
+                return
+            }
             arr = arr.shuffled()
             product *= arr.popLast()!.value
             cellsCount += 1
@@ -215,12 +202,15 @@ class GameViewModel: ObservableObject {
     }
     
     private func updateTargetNumberForPlus() {
-        var arr = cells.compactMap { $0 }
+        var arr = cells.compactMap { $0 }.filter { !$0.isDeleted }
         var sum = 0
         var cellsCount = 0
         
         // тут лучше выше среднего чтобы сумма была, а то одни 10 будут
         while sum < gameConfiguration.maxCellValue && cellsCount < gameConfiguration.maxCellsToSelect {
+            if arr.isEmpty {
+                return
+            }
             arr = arr.shuffled()
             sum += arr.popLast()!.value
             cellsCount += 1
@@ -234,9 +224,9 @@ class GameViewModel: ObservableObject {
         for row in 0..<gameConfiguration.boardSize {
             for col in 0..<gameConfiguration.boardSize {
                 var value = 0
-                if gameConfiguration.arithmeticSign == "+" {
+                if gameConfiguration.arithmeticSign == "Plus" {
                     value = Int.random(in: 1...gameConfiguration.maxCellValue)
-                } else if gameConfiguration.arithmeticSign == "*" {
+                } else if gameConfiguration.arithmeticSign == "Multiplication" {
                     value = Int.random(in: 2...gameConfiguration.maxCellValue)
                 }
                 let cell = CellItem(value: value, row: row, column: col)

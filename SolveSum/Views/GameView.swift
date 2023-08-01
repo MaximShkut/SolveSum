@@ -26,19 +26,20 @@ struct GameView: View {
                 VStack{
                     LinearGradient(
                         colors: [.white, .clear, .clear],
-                        startPoint: .top,
-                        endPoint: .bottom
+                        startPoint: .bottom,
+                        endPoint: .top
                     )
                     .mask(
                         Text("\(viewModel.formattedTime(viewModel.gameConfiguration.countDownTimer))")
                             .font(.system(size: 80, weight: .bold))
                             .foregroundColor(.black)
                             .frame(width: 300) 
-                            .offset(y: -300)
+                            .offset(y: +200)
                     )
                 }
             }
             
+            Spacer()
             VStack(spacing: 10) {
                 HStack {
                     VStack {
@@ -72,8 +73,8 @@ struct GameView: View {
                 ForEach(0..<viewModel.gameConfiguration.boardSize, id: \.self) { row in
                     HStack(spacing: 10) {
                         ForEach(0..<viewModel.gameConfiguration.boardSize, id: \.self) { column in
-                            if let cell = viewModel.getCell(row: row, column: column){
-                                if !cell.isDeleted{
+                            if let cell = viewModel.getCell(row: row, column: column) {
+                                if !cell.isDeleted {
                                     Button(action: {
                                         if let index = viewModel.cells.firstIndex(of: cell){
                                             viewModel.cells[index].isSelected.toggle()
@@ -81,8 +82,9 @@ struct GameView: View {
                                         }
                                     }, label: {
                                         Text("\(cell.value)")
+                                            .frame(width: viewModel.cellSize, height: viewModel.cellSize)
                                     })
-                                    .frame(width: viewModel.cellSize, height: viewModel.cellSize)
+                                    
                                     .background(Group{
                                         if cell.isSelected{
                                             Color.green
@@ -97,9 +99,10 @@ struct GameView: View {
                                     .foregroundColor(.white)
                                     .font(.headline)
                                     .cornerRadius(10)
+                                    .opacity(cell.cellOpacity)
                                     .offset(y: cell.offset)
                                 }
-                                else{
+                                else {
                                     Rectangle()
                                         .frame(width: viewModel.cellSize, height: viewModel.cellSize)
                                         .opacity(0)
@@ -108,20 +111,8 @@ struct GameView: View {
                         }
                     }
                 }
-                HStack{
-                    Button(action: {
-                        viewModel.startGame()
-                    }) {
-                        Text("Reset")
-                            .font(.headline)
-                            .padding()
-                            .foregroundColor(.white)
-                            .background(Color.red)
-                            .cornerRadius(10)
-                    }
-                }
+                Spacer()
             }
-            .offset(y: -50)
         }
         .onAppear{
             viewModel.startGame()
@@ -136,17 +127,6 @@ struct GameView: View {
                 isShowingAlert = true
             }
         }
-//        .alert(isPresented: $isShowingAlert) {
-//            Alert(
-//                title: Text("Congatulations"),
-//                message: Text("Your score is \(viewModel.score)"),
-//                dismissButton: .default(Text("Reset")) {
-//                    viewModel.startGame()
-//                    isTimerStart = true
-//                    viewModel.gameConfiguration.countDownTimer = countDowntimer
-//                }
-//            )
-//        }
     }
 }
 

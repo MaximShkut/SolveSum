@@ -16,4 +16,5 @@ struct CellItem: Identifiable, Hashable {
     var isDeleted: Bool = false
     var isHint: Bool = false
     var offset: CGFloat = 0
+    var cellOpacity: Double = 1.0
 }

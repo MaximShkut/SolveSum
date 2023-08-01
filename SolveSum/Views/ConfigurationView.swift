@@ -48,7 +48,7 @@ struct ConfigurationView: View {
                 Button(action: {
                     isPressed.toggle()
                     if isPressed {
-                        viewModel.makeEasyConfiguration()
+                        //viewModel.makeEasyConfiguration()
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2){
                             isPresented = false
                         }
@@ -61,7 +61,7 @@ struct ConfigurationView: View {
                 Button(action: {
                     isPressed.toggle()
                     if isPressed {
-                        viewModel.makeMediumConfiguration()
+                        //viewModel.makeMediumConfiguration()
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2){
                             isPresented = false
                         }
@@ -74,7 +74,7 @@ struct ConfigurationView: View {
                 Button(action: {
                     isPressed.toggle()
                     if isPressed {
-                        viewModel.makeHardConfiguration()
+                        //viewModel.makeHardConfiguration()
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2){
                             isPresented = false
                         }
@@ -87,7 +87,7 @@ struct ConfigurationView: View {
                 Button(action: {
                     isPressed.toggle()
                     if isPressed {
-                        viewModel.makeMediumConfiguration()
+                       // viewModel.makeMediumConfiguration()
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2){
                             isPresented = false
                         }
