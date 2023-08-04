@@ -3,4 +3,102 @@
    uuid = "183A4463-FC43-48C9-86DE-82B7CAC4E63C"
    type = "1"
    version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "4347C564-E4E8-4B95-BAC9-0671790C2494"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SolveSum/Views/GameView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "137"
+            endingLineNumber = "137"
+            landmarkName = "body"
+            landmarkType = "24">
+            <Locations>
+               <Location
+                  uuid = "4347C564-E4E8-4B95-BAC9-0671790C2494 - f7d74b880ed4f542"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 () -&gt; () in closure #4 () -&gt; SwiftUI.Alert in SolveSum.GameView.body.getter : some"
+                  moduleName = "SolveSum"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/user236450/Desktop/SolveSum/SolveSum/Views/GameView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "137"
+                  endingLineNumber = "137"
+                  offsetFromSymbolStart = "300">
+               </Location>
+               <Location
+                  uuid = "4347C564-E4E8-4B95-BAC9-0671790C2494 - f7d74b880ed4f542"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 () -&gt; () in closure #4 () -&gt; SwiftUI.Alert in SolveSum.GameView.body.getter : some"
+                  moduleName = "SolveSum"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/user236450/Desktop/SolveSum/SolveSum/Views/GameView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "137"
+                  endingLineNumber = "137"
+                  offsetFromSymbolStart = "384">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "3A8ED569-52CB-45BC-A498-3CE9931C6845"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SolveSum/ViewModels/DataManager.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "81"
+            endingLineNumber = "81"
+            landmarkName = "updateScore(userNickname:newScore:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "3A8ED569-52CB-45BC-A498-3CE9931C6845 - 522f50ab125e00bf"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "SolveSum.DataManager.updateScore(userNickname: Swift.String, newScore: Swift.Int) -&gt; ()"
+                  moduleName = "SolveSum"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/user236450/Desktop/SolveSum/SolveSum/ViewModels/DataManager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "82"
+                  endingLineNumber = "82"
+                  offsetFromSymbolStart = "68">
+               </Location>
+               <Location
+                  uuid = "3A8ED569-52CB-45BC-A498-3CE9931C6845 - 522f50ab125e00bf"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "SolveSum.DataManager.updateScore(userNickname: Swift.String, newScore: Swift.Int) -&gt; ()"
+                  moduleName = "SolveSum"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/user236450/Desktop/SolveSum/SolveSum/ViewModels/DataManager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "82"
+                  endingLineNumber = "82"
+                  offsetFromSymbolStart = "72">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
 </Bucket>

@@ -58,7 +58,7 @@ class GameViewModel: ObservableObject {
                 self.rewriteTable()
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2){
-                self.changeTargetNumberOverTime()
+                //self.changeTargetNumberOverTime()
                 self.addCell()
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3){
@@ -72,9 +72,9 @@ class GameViewModel: ObservableObject {
     }
     
     func changeTargetNumberOverTime() {
-        var timer = 120
-        var remainingTime = gameConfiguration.countDownTimer
-        var changer = (timer - remainingTime) / 10
+        let timer = 120
+        let remainingTime = gameConfiguration.countDownTimer
+        let changer = (timer - remainingTime) / 10
         gameConfiguration.maxCellValue = 10 + (2 * changer)
     }
     

@@ -72,6 +72,6 @@ struct OperationView: View {
 
 struct OperationView_Previews: PreviewProvider {
     static var previews: some View {
-        StartView()
+        OperationView()
     }
 }

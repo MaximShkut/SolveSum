@@ -6,9 +6,10 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 struct StartView: View {
-    @ObservedObject var viewModel = GameViewModel()
+    @EnvironmentObject var dataManager: DataManager
     
     var body: some View {
         NavigationView {
@@ -22,11 +23,14 @@ struct StartView: View {
                     }
                     .buttonStyle(StyleForButtonInPreviewScreen())
                     
-                    Button(action: {
-                        //exit(0)
-                    }, label: {
+                    NavigationLink(destination: LeaderBoard()) {
                         Text("Leader Board")
-                    })
+                    }
+                    .buttonStyle(StyleForButtonInPreviewScreen())
+                    
+                    NavigationLink(destination: UserSettingsView()) {
+                        Text("User Settings")
+                    }
                     .buttonStyle(StyleForButtonInPreviewScreen())
                 }
                 .padding()
@@ -35,7 +39,7 @@ struct StartView: View {
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
+struct StartView_Previews: PreviewProvider {
     static var previews: some View {
         StartView()
     }

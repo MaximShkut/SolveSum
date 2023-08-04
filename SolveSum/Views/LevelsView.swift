@@ -22,7 +22,8 @@ struct LevelsView: View {
                 VStack(spacing: 10) {
                     ForEach(0..<11, id: \.self) {id in
                         NavigationLink(isActive: $viewIsOn) {
-                            GameView().environmentObject(viewModel)
+                            GameView()
+                                .environmentObject(viewModel)
                         } label: {
                             Button(action: {
                                 if id != 10 {
@@ -30,7 +31,7 @@ struct LevelsView: View {
                                     viewModel.gameConfiguration.boardSize = 2 + (id / 2)
                                     viewModel.gameConfiguration.countAddCell = 2 + (id + 1)
                                 } else {
-                                    viewModel.gameConfiguration.countDownTimer = 120
+                                    viewModel.gameConfiguration.countDownTimer = 20
                                     viewModel.gameConfiguration.countAddCell = 1000
                                     viewModel.gameConfiguration.boardSize = 6
                                     viewModel.gameConfiguration.maxCellValue = 10

@@ -8,17 +8,18 @@
 import SwiftUI
 
 struct GameView: View {
+    @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var viewModel: GameViewModel
+    @EnvironmentObject var dataManager: DataManager
     
     @State private var isTimerStart: Bool = false
-    @State private var isShowingAlert: Bool = false
+    @State private var isGameFinished = false
     @State private var countDowntimer = 0
     
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
     var body: some View{
         ZStack {
-            //LinearGradient(gradient: Gradient(colors: [Color.red, Color.blue]), startPoint: .top, endPoint: .bottom)
             Color.mint.opacity(0.4)
                 .ignoresSafeArea()
             
@@ -38,8 +39,8 @@ struct GameView: View {
                     )
                 }
             }
-            
             Spacer()
+            
             VStack(spacing: 10) {
                 HStack {
                     VStack {
@@ -76,7 +77,7 @@ struct GameView: View {
                             if let cell = viewModel.getCell(row: row, column: column) {
                                 if !cell.isDeleted {
                                     Button(action: {
-                                        if let index = viewModel.cells.firstIndex(of: cell){
+                                        if let index = viewModel.cells.firstIndex(of: cell) {
                                             viewModel.cells[index].isSelected.toggle()
                                             viewModel.checkProgress()
                                         }
@@ -85,14 +86,12 @@ struct GameView: View {
                                             .frame(width: viewModel.cellSize, height: viewModel.cellSize)
                                     })
                                     
-                                    .background(Group{
-                                        if cell.isSelected{
+                                    .background(Group {
+                                        if cell.isSelected {
                                             Color.green
-                                        }
-                                        else if cell.isHint{
+                                        } else if cell.isHint {
                                             Color.yellow
-                                        }
-                                        else{
+                                        } else {
                                             Color.blue
                                         }
                                     })
@@ -116,17 +115,34 @@ struct GameView: View {
         }
         .onAppear{
             viewModel.startGame()
-            isTimerStart = true
             countDowntimer = viewModel.gameConfiguration.countDownTimer
-        }
-        .onReceive(timer){ _ in
-            if viewModel.gameConfiguration.countDownTimer > 0 && isTimerStart{
-                viewModel.gameConfiguration.countDownTimer -= 1
-            } else {
-                isTimerStart = false
-                isShowingAlert = true
+            if countDowntimer != 0 {
+                isTimerStart = true
             }
         }
+        .onReceive(timer){ _ in
+            if isTimerStart {
+                if viewModel.gameConfiguration.countDownTimer == 0 {
+                    isTimerStart = false
+                    isGameFinished = true
+                }
+                viewModel.gameConfiguration.countDownTimer -= 1
+            }
+        }
+        .alert(isPresented: $isGameFinished, content: {
+            Alert(
+                title: Text("Game Over"),
+                message: Text("Your score: \(viewModel.score)"),
+                dismissButton: .default(Text("OK"), action: {
+                    if let currentUser = dataManager.currentUser {
+                        if currentUser.score < viewModel.score {
+                            dataManager.updateScore(userNickname: currentUser.nickname, newScore: viewModel.score)
+                            presentationMode.wrappedValue.dismiss()
+                        }
+                    }
+                })
+            )
+        })
     }
 }
 
